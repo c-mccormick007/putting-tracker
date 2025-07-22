@@ -4,7 +4,8 @@ import { useState } from "react"
 
 export default function NewDrill(){
     const [distances, setDistances] = useState<number[]>([15]);
-    //const [windType, setWindType] = useState({direction:"", intensity:""})
+    //const [wind, setWind] = useState(false); - give user option to log wind or not
+    const [windType, setWindType] = useState({direction:"", intensity:""})
     
     return (
         <div className="p-6 max-w-md mx-auto space-y-4">
@@ -32,6 +33,43 @@ export default function NewDrill(){
                 onClick={() => setDistances([...distances, 0])}
                 className="mt-2 text-blue-600 border rounded p-2"
             >+ Add Distance</button>
+                <label className="block mb-2 mt-3 font-medium">Wind Speed/Intensity?</label>
+                <div className="flex max-w-md">
+                    <div>
+                    {["Headwind","Left to Right","Right to Left","Tailwind"].map(dir => (
+                        <label key={dir} className="mr-4 flex p-3">
+                            <input 
+                                type="radio"
+                                name="direction"
+                                value={dir}
+                                checked={windType.direction === dir}
+                                onChange={(e) => {
+                                    setWindType(prev => ({...prev, direction: e.target.value }))
+                                }}
+                                className="mr-1" 
+                            />
+                            {dir}
+                        </label>
+                    ))}
+                    </div>
+                    <div>
+                    {["Calm","Moderate","Intense"].map(i => (
+                        <label key={i} className="mr-4 flex p-3">
+                            <input 
+                                type="radio"
+                                name="intensity"
+                                value={i}
+                                checked={windType.intensity === i}
+                                onChange={(e) => {
+                                    setWindType(prev => ({...prev, intensity: e.target.value }))
+                                }}
+                                className="mr-1" 
+                            />
+                            {i}
+                        </label>
+                    ))}
+                    </div>
+                </div>
             </div>
         </div>
     )
