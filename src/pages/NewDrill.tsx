@@ -1,11 +1,35 @@
 import { useState } from "react"
-//import { useNavigate } from "react-router-dom"
-//import { supabase } from "../lib/supabase"
+import { useNavigate } from "react-router-dom"
+import { supabase } from "../lib/supabase"
 
 export default function NewDrill(){
     const [distances, setDistances] = useState<number[]>([15]);
     const [wind, setWind] = useState(false);
-    const [windType, setWindType] = useState({direction:"", intensity:""})
+    const [windType, setWindType] = useState({direction:"", intensity:""});
+    const [error, setError] = useState("");
+    const navigate = useNavigate();
+
+    const handleSubmit = async () => {
+        const user = (await supabase.auth.getUser()).data.user;
+        if (!user) {
+            setError("Not logged in.");
+            return;
+        }
+
+        const { data, error } = await supabase.from("drills").insert({
+            user_id: user.id,
+            distances: distances,
+            wind: wind,
+            wind_type: windType
+        }).select().single();
+
+        if (error) {
+            setError(error.message);
+            return;
+        }
+
+        navigate(`/drill/${data.id}`);
+    }
     
     return (
         <div className="p-6 max-w-md mx-auto space-y-4">
@@ -22,7 +46,8 @@ export default function NewDrill(){
                                 copy[i] = Number(e.target.value);
                                 setDistances(copy);
                             }}
-                            className="flex-1 border p-2 rounded" 
+                            className="flex-1 border p-2 rounded no-spinner"
+                            onFocus={(e) => e.target.select()} 
                         />
                         <button onClick={() => {
                             setDistances(distances.filter((_, del) => del !== i))
@@ -34,7 +59,12 @@ export default function NewDrill(){
                 className="mt-2 text-blue-600 border rounded p-2"
             >+ Add Distance</button>
                 <label className="block mb-2 mt-3 font-medum">Log wind?</label>
-                <input type="checkbox" name="wind" onChange={() => setWind(!wind)} />
+                <input type="checkbox" name="wind" onChange={() => {
+                    setWind(!wind)
+                    if (!wind){
+                        setWindType({direction:"",intensity:""})
+                    }
+                }} />
                 {wind ? 
                     <>
                     <label className="block mb-2 mt-3 font-medium">Wind Speed/Intensity?</label>
@@ -78,9 +108,13 @@ export default function NewDrill(){
                     : 
                     <div></div>
                 }
-                
-                
             </div>
+            <button
+                onClick={handleSubmit}
+                className="bg-blue-600 text-white px-4 py-2 rounded"
+            >Start Drill</button>
+
+            {error && <p className="text-red-500">{error}</p>}
         </div>
     )
 }
