@@ -28,7 +28,7 @@ function App() {
   if (!loaded) return null;
   if (!session) return (
     <div className="h-screen flex flex-col items-center justify-center bg-gray-950 text-gray-100">
-      <h1 className="text-5xl">PUTTING TRACKER</h1>
+      <h1 className="text-5xl m-2 text-center">PUTTING TRACKER</h1>
       <Auth 
         supabaseClient={supabase}
         appearance={{theme: ThemeSupa}}
