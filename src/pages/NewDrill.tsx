@@ -7,6 +7,7 @@ export default function NewDrill(){
     const [wind, setWind] = useState(false);
     const [windType, setWindType] = useState({direction:"", intensity:""});
     const [error, setError] = useState("");
+    const [reps, setReps] = useState(0);
     const navigate = useNavigate();
 
     const handleSubmit = async () => {
@@ -20,7 +21,8 @@ export default function NewDrill(){
             user_id: user.id,
             distances: distances,
             wind: wind,
-            wind_type: windType
+            wind_type: windType,
+            reps: reps
         }).select().single();
 
         if (error) {
@@ -108,6 +110,16 @@ export default function NewDrill(){
                     : 
                     <div></div>
                 }
+            </div>
+            <div className="flex">
+                <label className="pr-1">Reps per Distance:</label>
+                <input 
+                    type="number"
+                    value={reps}
+                    onChange={(e) =>setReps(Number(e.target.value))}
+                    className="flex-1 border p-2 rounded no-spinner"
+                    onFocus={(e) => e.target.select()} 
+                />
             </div>
             <button
                 onClick={handleSubmit}
