@@ -4,7 +4,7 @@ import { useState } from "react"
 
 export default function NewDrill(){
     const [distances, setDistances] = useState<number[]>([15]);
-    //const [wind, setWind] = useState(false); - give user option to log wind or not
+    const [wind, setWind] = useState(false);
     const [windType, setWindType] = useState({direction:"", intensity:""})
     
     return (
@@ -33,8 +33,12 @@ export default function NewDrill(){
                 onClick={() => setDistances([...distances, 0])}
                 className="mt-2 text-blue-600 border rounded p-2"
             >+ Add Distance</button>
-                <label className="block mb-2 mt-3 font-medium">Wind Speed/Intensity?</label>
-                <div className="flex max-w-md">
+                <label className="block mb-2 mt-3 font-medum">Log wind?</label>
+                <input type="checkbox" name="wind" onChange={() => setWind(!wind)} />
+                {wind ? 
+                    <>
+                    <label className="block mb-2 mt-3 font-medium">Wind Speed/Intensity?</label>
+                    <div className="flex max-w-md">
                     <div>
                     {["Headwind","Left to Right","Right to Left","Tailwind"].map(dir => (
                         <label key={dir} className="mr-4 flex p-3">
@@ -70,6 +74,12 @@ export default function NewDrill(){
                     ))}
                     </div>
                 </div>
+                </>
+                    : 
+                    <div></div>
+                }
+                
+                
             </div>
         </div>
     )
