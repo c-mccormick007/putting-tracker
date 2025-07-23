@@ -15,6 +15,8 @@ export default function Drill(){
     const [drill, setDrill] = useState<Drill | null>(null);
     const [selectedDistance, setSelectedDistance] = useState<number | null>(null);
     const [error, setError] = useState("")
+    const [repNumber, setRepNumber] = useState(0);
+    const [distanceIndex, setDistanceIndex] = useState(0);
 
     useEffect(() => {
         if (!id) {return;}
@@ -27,10 +29,17 @@ export default function Drill(){
                 if (error) setError(error.message);
                 else {
                     setDrill(data);
-                    setSelectedDistance(data.distances[0]);
+                    setDistanceIndex(0);
+                    setRepNumber(0);
                 } 
             });
     }, [id]) 
+
+    useEffect(() => {
+        if (drill) {
+            setSelectedDistance(drill.distances[distanceIndex]);
+        }
+    }, [drill, distanceIndex])
 
     if (error) return <p className="p-6 text-red-500">{error}</p>
     if (!drill) return <p className="p-6">Loading drill...</p>
@@ -62,21 +71,40 @@ export default function Drill(){
                 </button>
             </div>
 
+            <h2 className="text-lg text-center">
+                Rep {repNumber + 1} of {drill.reps}
+            </h2>
+
 
         </div>
     )
 
     async function handlePutt(result: "hit" | "miss") {
-        if (!selectedDistance) return;
+        if (!selectedDistance || !drill) return;
 
         const { error } = await supabase.from("putts").insert({
             drill_id: id,
             result,
+            distance: selectedDistance,
         });
 
         if (error) {
             console.error("Failed to log putt: ", error.message);
             setError(error.message);
+            return;
+        }
+
+        const nextRepNumber = repNumber + 1;
+
+        if (nextRepNumber >= drill.reps){
+            if (distanceIndex + 1 < drill.distances.length){
+                setDistanceIndex(distanceIndex + 1);
+                setRepNumber(0);
+            }else {
+                alert("Drill complete!")
+            }
+        } else{
+            setRepNumber(nextRepNumber)
         }
     }
     
