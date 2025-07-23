@@ -46,9 +46,39 @@ export default function Drill(){
                 <h2 className="text-xl font-bold text-center">{selectedDistance} feet</h2>
                 <h2 className="text-xl text-center">{circleHelper(selectedDistance)}</h2>
             </div>
+
+            <div className="flex gap-4 justify-center mt-6">
+                <button
+                    onClick={() => handlePutt("hit")}
+                    className="bg-green-600 text-white text-xl px-6 py-3 rounded"
+                >
+                    HIT
+                </button>
+                <button
+                    onClick={() => handlePutt("miss")}
+                    className="bg-red-600 text-white text-xl px-6 py-3 rounded"
+                >
+                    MISS
+                </button>
+            </div>
+
+
         </div>
     )
 
+    async function handlePutt(result: "hit" | "miss") {
+        if (!selectedDistance) return;
+
+        const { error } = await supabase.from("putts").insert({
+            drill_id: id,
+            result,
+        });
+
+        if (error) {
+            console.error("Failed to log putt: ", error.message);
+            setError(error.message);
+        }
+    }
     
 } 
 function circleHelper(ft: number | null): string {
